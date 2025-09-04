@@ -8,40 +8,57 @@
     body {
       font-family: "Segoe UI", Tahoma, sans-serif;
       text-align: center;
-      background: linear-gradient(135deg, #dfe9f3, #ffffff);
       margin: 0;
       padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url("https://cdn.pixabay.com/photo/2017/08/30/01/05/books-2696809_1280.jpg") no-repeat center center/cover;
     }
+
     .quiz-container {
-      max-width: 700px;
-      margin: auto;
-      background: #fefefe;
+      width: 90%;
+      max-width: 750px;
+      background: rgba(255, 255, 255, 0.95);
       padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+      border-radius: 20px;
+      box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+      position: relative;
+      animation: fadeIn 0.6s ease-in-out;
     }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
     h2 {
       color: #2c3e50;
       margin-bottom: 10px;
     }
+
     img {
       max-width: 100%;
       border-radius: 12px;
       margin-bottom: 20px;
       border: 3px solid #90caf9;
     }
+
     .timer {
       font-size: 20px;
       font-weight: bold;
       margin: 10px 0 20px;
       color: #e53935;
     }
+
     .options {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-bottom: 15px;
     }
+
     .options button {
       padding: 12px;
       font-size: 16px;
@@ -63,6 +80,7 @@
       background: #e53935;
       color: white;
     }
+
     .next-btn, .restart-btn {
       margin-top: 15px;
       padding: 12px 25px;
@@ -77,27 +95,65 @@
     .next-btn:hover, .restart-btn:hover {
       background: #1e88e5;
     }
-    #score {
-      font-size: 18px;
-      margin-top: 15px;
-      color: #2e7d32;
+
+    /* Random toggle button */
+    .toggle-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 8px 15px;
+      background: #ffca28;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
       font-weight: bold;
+    }
+    .toggle-btn.active {
+      background: #66bb6a;
+      color: white;
+    }
+
+    /* Final result box */
+    .result-box {
+      display: none;
+      padding: 30px;
+      border-radius: 15px;
+      background: #fefefe;
+      box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.2);
+      animation: fadeIn 0.7s ease-in-out;
+    }
+    .result-box h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+    .result-box p {
+      font-size: 18px;
+      margin: 5px 0;
     }
   </style>
 </head>
 <body>
-  <div class="quiz-container">
+  <div class="quiz-container" id="quiz-box">
+    <button class="toggle-btn" id="random-toggle">Random: ON</button>
     <h2>📘 Study Quiz</h2>
-    <div class="timer">Time left: <span id="time">10</span>s</div>
+    <div class="timer">Time left: <span id="time">30</span>s</div>
     <img id="question-img" src="" alt="Question">
     <div class="options" id="options"></div>
     <button class="next-btn" onclick="nextQuestion()">Next</button>
     <button class="restart-btn" onclick="restartQuiz()" style="display:none;">Restart</button>
-    <p id="score"></p>
+  </div>
+
+  <div class="result-box" id="result-box">
+    <h3>🎓 Quiz Completed!</h3>
+    <p id="final-score"></p>
+    <p id="percentage"></p>
+    <p id="message"></p>
+    <button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
   </div>
 
   <script>
-    const questions = [
+    let questions = [
       { img: "images/q1.png", correct: "c" },
       { img: "images/q2.png", correct: "b" },
       { img: "images/q3.png", correct: "d" },
@@ -128,16 +184,16 @@
       { img: "images/q28.png", correct: "d" },
       { img: "images/q29.png", correct: "c" },
       { img: "images/q30.png", correct: "b" },
-      { img: "images/q31.png", correct: "b" },
+      { img: "images/q31.png", correct: "c" },
       { img: "images/q32.png", correct: "a" },
       { img: "images/q33.png", correct: "b" },
       { img: "images/q34.png", correct: "d" },
-      { img: "images/q35.png", correct: "b" },
-      { img: "images/q36.png", correct: "a" },
+      { img: "images/q35.png", correct: "d" },
+      { img: "images/q36.png", correct: "b" },
       { img: "images/q37.png", correct: "c" },
-      { img: "images/q38.png", correct: "d" },
+      { img: "images/q38.png", correct: "a" },
       { img: "images/q39.png", correct: "c" },
-      { img: "images/q40.png", correct: "b" },
+      { img: "images/q40.png", correct: "d" },
       { img: "images/q41.png", correct: "a" },
       { img: "images/q42.png", correct: "a" },
       { img: "images/q43.png", correct: "a" },
@@ -148,33 +204,46 @@
       { img: "images/q48.png", correct: "a" },
       { img: "images/q49.png", correct: "b" },
       { img: "images/q50.png", correct: "b" },
-      { img: "images/q51.png", correct: "a" },
-      { img: "images/q52.png", correct: "a" },
-      { img: "images/q53.png", correct: "" },
+      { img: "images/q51.png", correct: "c" },
+      { img: "images/q52.png", correct: "d" },
+      { img: "images/q53.png", correct: "d" },
       { img: "images/q54.png", correct: "d" },
       { img: "images/q55.png", correct: "b" },
       { img: "images/q56.png", correct: "a" },
-      { img: "images/q57.png", correct: "c" },
-      { img: "images/q58.png", correct: "d" },
+      { img: "images/q57.png", correct: "a" },
+      { img: "images/q58.png", correct: "a" },
       { img: "images/q59.png", correct: "c" },
       { img: "images/q60.png", correct: "b" }
-      
-      
-
     ];
 
     const optionLabels = ["a", "b", "c", "d"];
+    let shuffledQuestions = [];
     let currentQuestion = 0;
     let score = 0;
     let timer;
     let timeLeft = 30;
+    let randomOn = true;
 
     const imgElement = document.getElementById("question-img");
     const optionsDiv = document.getElementById("options");
-    const scoreElement = document.getElementById("score");
     const nextBtn = document.querySelector(".next-btn");
-    const restartBtn = document.querySelector(".restart-btn");
     const timeDisplay = document.getElementById("time");
+    const randomToggle = document.getElementById("random-toggle");
+
+    const quizBox = document.getElementById("quiz-box");
+    const resultBox = document.getElementById("result-box");
+    const finalScore = document.getElementById("final-score");
+    const percentage = document.getElementById("percentage");
+    const message = document.getElementById("message");
+
+    // Fisher-Yates shuffle
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
 
     function loadQuestion() {
       clearInterval(timer);
@@ -182,7 +251,7 @@
       timeDisplay.textContent = timeLeft;
       timer = setInterval(updateTimer, 1000);
 
-      let q = questions[currentQuestion];
+      let q = shuffledQuestions[currentQuestion];
       imgElement.src = q.img;
       optionsDiv.innerHTML = "";
 
@@ -192,6 +261,8 @@
         btn.onclick = () => checkAnswer(label, btn);
         optionsDiv.appendChild(btn);
       });
+
+      nextBtn.disabled = true;
     }
 
     function updateTimer() {
@@ -199,13 +270,13 @@
       timeDisplay.textContent = timeLeft;
       if (timeLeft <= 0) {
         clearInterval(timer);
-        nextQuestion();
+        nextBtn.disabled = false; // only allow next, don't reveal answer
       }
     }
 
     function checkAnswer(answer, button) {
       clearInterval(timer);
-      let correct = questions[currentQuestion].correct;
+      let correct = shuffledQuestions[currentQuestion].correct;
       if (answer === correct) {
         button.classList.add("correct");
         score++;
@@ -217,32 +288,62 @@
           }
         });
       }
+      nextBtn.disabled = false;
     }
 
     function nextQuestion() {
       currentQuestion++;
-      if (currentQuestion < questions.length) {
+      if (currentQuestion < shuffledQuestions.length) {
         loadQuestion();
       } else {
-        imgElement.style.display = "none";
-        optionsDiv.style.display = "none";
-        nextBtn.style.display = "none";
-        scoreElement.textContent = `✅ Your Score: ${score}/${questions.length}`;
-        restartBtn.style.display = "inline-block";
+        showResults();
+      }
+    }
+
+    function showResults() {
+      quizBox.style.display = "none";
+      resultBox.style.display = "block";
+
+      let percent = Math.round((score / shuffledQuestions.length) * 100);
+      finalScore.textContent = `✅ Your Score: ${score}/${shuffledQuestions.length}`;
+      percentage.textContent = `📊 Percentage: ${percent}%`;
+
+      if (percent >= 80) {
+        message.textContent = "🌟 Excellent! You're a study champion!";
+      } else if (percent >= 50) {
+        message.textContent = "👍 Good effort! Keep practicing.";
+      } else {
+        message.textContent = "📖 Don't give up! Try again and improve.";
       }
     }
 
     function restartQuiz() {
       currentQuestion = 0;
       score = 0;
-      imgElement.style.display = "block";
-      optionsDiv.style.display = "grid";
-      nextBtn.style.display = "inline-block";
-      restartBtn.style.display = "none";
-      scoreElement.textContent = "";
+      shuffledQuestions = randomOn ? shuffleArray([...questions]) : [...questions];
+      quizBox.style.display = "block";
+      resultBox.style.display = "none";
       loadQuestion();
     }
 
+    // Random toggle button
+    randomToggle.addEventListener("click", () => {
+      randomOn = !randomOn;
+      randomToggle.textContent = randomOn ? "Random: ON" : "Random: OFF";
+      randomToggle.classList.toggle("active", randomOn);
+      restartQuiz();
+    });
+function updateTimer() {
+  timeLeft--;
+  timeDisplay.textContent = timeLeft;
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    nextQuestion(); // ⬅️ directly move to next question
+  }
+}
+
+    // Start quiz
+    shuffledQuestions = shuffleArray([...questions]);
     loadQuestion();
   </script>
 </body>
