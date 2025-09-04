@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Quiz</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #dfe9f3, #ffffff);
+      margin: 0;
+      padding: 20px;
+    }
+    .quiz-container {
+      max-width: 700px;
+      margin: auto;
+      background: #fefefe;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+    }
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    img {
+      max-width: 100%;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 3px solid #90caf9;
+    }
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 10px 0 20px;
+      color: #e53935;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    .options button {
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #e3f2fd;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .options button:hover {
+      background: #bbdefb;
+      transform: scale(1.03);
+    }
+    .options button.correct {
+      background: #4caf50;
+      color: white;
+    }
+    .options button.wrong {
+      background: #e53935;
+      color: white;
+    }
+    .next-btn, .restart-btn {
+      margin-top: 15px;
+      padding: 12px 25px;
+      font-size: 16px;
+      background: #42a5f5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .next-btn:hover, .restart-btn:hover {
+      background: #1e88e5;
+    }
+    #score {
+      font-size: 18px;
+      margin-top: 15px;
+      color: #2e7d32;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <h2>📘 Study Quiz</h2>
+    <div class="timer">Time left: <span id="time">10</span>s</div>
+    <img id="question-img" src="" alt="Question">
+    <div class="options" id="options"></div>
+    <button class="next-btn" onclick="nextQuestion()">Next</button>
+    <button class="restart-btn" onclick="restartQuiz()" style="display:none;">Restart</button>
+    <p id="score"></p>
+  </div>
+
+  <script>
+    const questions = [
+      { img: "images/q1.png", correct: "c" },
+      { img: "images/q2.png", correct: "b" },
+      { img: "images/q3.png", correct: "d" },
+      { img: "images/q4.png", correct: "b" },
+      { img: "images/q5.png", correct: "c" },
+      { img: "images/q6.png", correct: "b" },
+      { img: "images/q7.png", correct: "c" },
+      { img: "images/q8.png", correct: "c" },
+      { img: "images/q9.png", correct: "c" },
+      { img: "images/q10.png", correct: "b" },
+      { img: "images/q11.png", correct: "d" },
+      { img: "images/q12.png", correct: "c" },
+      { img: "images/q13.png", correct: "b" },
+      { img: "images/q14.png", correct: "a" },
+      { img: "images/q15.png", correct: "c" },
+      { img: "images/q16.png", correct: "c" },
+      { img: "images/q17.png", correct: "d" },
+      { img: "images/q18.png", correct: "a" },
+      { img: "images/q19.png", correct: "a" },
+      { img: "images/q20.png", correct: "d" },
+      { img: "images/q21.png", correct: "b" },
+      { img: "images/q22.png", correct: "a" },
+      { img: "images/q23.png", correct: "b" },
+      { img: "images/q24.png", correct: "d" },
+      { img: "images/q25.png", correct: "b" },
+      { img: "images/q26.png", correct: "a" },
+      { img: "images/q27.png", correct: "c" },
+      { img: "images/q28.png", correct: "d" },
+      { img: "images/q29.png", correct: "c" },
+      { img: "images/q30.png", correct: "b" },
+      { img: "images/q31.png", correct: "b" },
+      { img: "images/q32.png", correct: "a" },
+      { img: "images/q33.png", correct: "b" },
+      { img: "images/q34.png", correct: "d" },
+      { img: "images/q35.png", correct: "b" },
+      { img: "images/q36.png", correct: "a" },
+      { img: "images/q37.png", correct: "c" },
+      { img: "images/q38.png", correct: "d" },
+      { img: "images/q39.png", correct: "c" },
+      { img: "images/q40.png", correct: "b" },
+      { img: "images/q41.png", correct: "a" },
+      { img: "images/q42.png", correct: "a" },
+      { img: "images/q43.png", correct: "a" },
+      { img: "images/q44.png", correct: "b" },
+      { img: "images/q45.png", correct: "b" },
+      { img: "images/q46.png", correct: "b" },
+      { img: "images/q47.png", correct: "b" },
+      { img: "images/q48.png", correct: "a" },
+      { img: "images/q49.png", correct: "b" },
+      { img: "images/q50.png", correct: "b" },
+      { img: "images/q51.png", correct: "a" },
+      { img: "images/q52.png", correct: "a" },
+      { img: "images/q53.png", correct: "" },
+      { img: "images/q54.png", correct: "d" },
+      { img: "images/q55.png", correct: "b" },
+      { img: "images/q56.png", correct: "a" },
+      { img: "images/q57.png", correct: "c" },
+      { img: "images/q58.png", correct: "d" },
+      { img: "images/q59.png", correct: "c" },
+      { img: "images/q60.png", correct: "b" }
+      
+      
+
+    ];
+
+    const optionLabels = ["a", "b", "c", "d"];
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 30;
+
+    const imgElement = document.getElementById("question-img");
+    const optionsDiv = document.getElementById("options");
+    const scoreElement = document.getElementById("score");
+    const nextBtn = document.querySelector(".next-btn");
+    const restartBtn = document.querySelector(".restart-btn");
+    const timeDisplay = document.getElementById("time");
+
+    function loadQuestion() {
+      clearInterval(timer);
+      timeLeft = 30;
+      timeDisplay.textContent = timeLeft;
+      timer = setInterval(updateTimer, 1000);
+
+      let q = questions[currentQuestion];
+      imgElement.src = q.img;
+      optionsDiv.innerHTML = "";
+
+      optionLabels.forEach(label => {
+        let btn = document.createElement("button");
+        btn.textContent = label.toUpperCase();
+        btn.onclick = () => checkAnswer(label, btn);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function updateTimer() {
+      timeLeft--;
+      timeDisplay.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        nextQuestion();
+      }
+    }
+
+    function checkAnswer(answer, button) {
+      clearInterval(timer);
+      let correct = questions[currentQuestion].correct;
+      if (answer === correct) {
+        button.classList.add("correct");
+        score++;
+      } else {
+        button.classList.add("wrong");
+        Array.from(optionsDiv.children).forEach(btn => {
+          if (btn.textContent.toLowerCase() === correct) {
+            btn.classList.add("correct");
+          }
+        });
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        imgElement.style.display = "none";
+        optionsDiv.style.display = "none";
+        nextBtn.style.display = "none";
+        scoreElement.textContent = `✅ Your Score: ${score}/${questions.length}`;
+        restartBtn.style.display = "inline-block";
+      }
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      imgElement.style.display = "block";
+      optionsDiv.style.display = "grid";
+      nextBtn.style.display = "inline-block";
+      restartBtn.style.display = "none";
+      scoreElement.textContent = "";
+      loadQuestion();
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
