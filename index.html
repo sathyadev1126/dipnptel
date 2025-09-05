@@ -33,9 +33,34 @@
       to {opacity: 1; transform: translateY(0);}
     }
 
+    @keyframes fadeOut {
+      from {opacity: 1; transform: translateY(0);}
+      to {opacity: 0; transform: translateY(-20px);}
+    }
+
     h2 {
       color: #2c3e50;
       margin-bottom: 10px;
+    }
+
+    /* Question number + Timer row */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .question-number {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1565c0;
+    }
+
+    .timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: #e53935;
     }
 
     img {
@@ -43,13 +68,6 @@
       border-radius: 12px;
       margin-bottom: 20px;
       border: 3px solid #90caf9;
-    }
-
-    .timer {
-      font-size: 20px;
-      font-weight: bold;
-      margin: 10px 0 20px;
-      color: #e53935;
     }
 
     .options {
@@ -96,7 +114,6 @@
       background: #1e88e5;
     }
 
-    /* Random toggle button */
     .toggle-btn {
       position: absolute;
       top: 15px;
@@ -113,7 +130,6 @@
       color: white;
     }
 
-    /* Final result box */
     .result-box {
       display: none;
       padding: 30px;
@@ -134,15 +150,22 @@
   </style>
 </head>
 <body>
+  
   <div class="quiz-container" id="quiz-box">
     <button class="toggle-btn" id="random-toggle">Random: ON</button>
     <h2>📘 Study Quiz</h2>
-    <div class="timer">Time left: <span id="time">30</span>s</div>
+
+    <!-- Question number + Timer row -->
+    <div class="top-bar">
+      <div class="question-number" id="question-number"></div>
+      <div class="timer">Time left: <span id="time">30</span>s</div>
+    </div>
+
     <img id="question-img" src="" alt="Question">
     <div class="options" id="options"></div>
     <button class="next-btn" onclick="nextQuestion()">Next</button>
     <button class="restart-btn" onclick="restartQuiz()" style="display:none;">Restart</button>
-     <div class="footer">© Created by Sathyadev</div>
+    <div class="footer">© Created by Sathyadev</div>
   </div>
 
   <div class="result-box" id="result-box">
@@ -154,7 +177,7 @@
   </div>
 
   <script>
-    let questions = [
+     let questions = [
       { img: "images/q1.png", correct: "c" },
       { img: "images/q2.png", correct: "b" },
       { img: "images/q3.png", correct: "d" },
@@ -230,6 +253,7 @@
     const nextBtn = document.querySelector(".next-btn");
     const timeDisplay = document.getElementById("time");
     const randomToggle = document.getElementById("random-toggle");
+    const questionNumber = document.getElementById("question-number");
 
     const quizBox = document.getElementById("quiz-box");
     const resultBox = document.getElementById("result-box");
@@ -237,7 +261,6 @@
     const percentage = document.getElementById("percentage");
     const message = document.getElementById("message");
 
-    // Fisher-Yates shuffle
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -253,17 +276,26 @@
       timer = setInterval(updateTimer, 1000);
 
       let q = shuffledQuestions[currentQuestion];
-      imgElement.src = q.img;
-      optionsDiv.innerHTML = "";
 
-      optionLabels.forEach(label => {
-        let btn = document.createElement("button");
-        btn.textContent = label.toUpperCase();
-        btn.onclick = () => checkAnswer(label, btn);
-        optionsDiv.appendChild(btn);
-      });
+      // Fade-out effect before loading
+      quizBox.style.animation = "fadeOut 0.3s ease-in";
+      setTimeout(() => {
+        imgElement.src = q.img;
+        optionsDiv.innerHTML = "";
+        questionNumber.textContent = `Question ${currentQuestion + 1} of ${shuffledQuestions.length}`;
 
-      nextBtn.disabled = true;
+        optionLabels.forEach(label => {
+          let btn = document.createElement("button");
+          btn.textContent = label.toUpperCase();
+          btn.onclick = () => checkAnswer(label, btn);
+          optionsDiv.appendChild(btn);
+        });
+
+        nextBtn.disabled = true;
+
+        // Fade-in effect
+        quizBox.style.animation = "fadeIn 0.5s ease-in-out";
+      }, 300);
     }
 
     function updateTimer() {
@@ -271,7 +303,7 @@
       timeDisplay.textContent = timeLeft;
       if (timeLeft <= 0) {
         clearInterval(timer);
-        nextBtn.disabled = false; // only allow next, don't reveal answer
+        nextQuestion(); 
       }
     }
 
@@ -327,23 +359,13 @@
       loadQuestion();
     }
 
-    // Random toggle button
     randomToggle.addEventListener("click", () => {
       randomOn = !randomOn;
       randomToggle.textContent = randomOn ? "Random: ON" : "Random: OFF";
       randomToggle.classList.toggle("active", randomOn);
       restartQuiz();
     });
-function updateTimer() {
-  timeLeft--;
-  timeDisplay.textContent = timeLeft;
-  if (timeLeft <= 0) {
-    clearInterval(timer);
-    nextQuestion(); // ⬅️ directly move to next question
-  }
-}
 
-    // Start quiz
     shuffledQuestions = shuffleArray([...questions]);
     loadQuestion();
   </script>
